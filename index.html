@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Flooded Lab: A Water Escape Room</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#e6f4f7;--ink:#0b2f4a;--card:#fff;--line:#8fc3d0;--accent:#ffc83d;--aink:#3a2a00;--water:#2a9bc9;--good:#0f6b41;--gbg:#dcf4e6;--bad:#9c2f1b;--bbg:#fde6df;--muted:#44687b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0a2233;--ink:#e3f3f8;--card:#12364d;--line:#2f6a85;--accent:#ffc83d;--water:#2a9bc9;--good:#7be0ac;--gbg:#0f3d2c;--bad:#ffb3a1;--bbg:#4a1f17;--muted:#9bc2d3}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0a2233;--ink:#e3f3f8;--card:#12364d;--line:#2f6a85;--accent:#ffc83d;--water:#2a9bc9;--good:#7be0ac;--gbg:#0f3d2c;--bad:#ffb3a1;--bbg:#4a1f17;--muted:#9bc2d3}
+*,*:before,*:after{box-sizing:inherit}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:400 18px/1.55 Lexend,system-ui,Segoe UI,Arial,sans-serif;min-height:100%}
+main{max-width:760px;margin:0 auto;padding:16px}
+h1{font-size:clamp(28px,6vw,44px);line-height:1.1;margin:0 0 8px;font-weight:800}
+h2{font-size:22px;margin:0 0 4px;font-weight:600}
+p{margin:8px 0}
+.muted{color:var(--muted);font-size:16px}
+.hud{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:14px}
+.tank{height:22px;border:2px solid var(--line);border-radius:11px;overflow:hidden;background:transparent;position:relative}
+.tank i{display:block;height:100%;background:var(--water);transition:width 1s ease}
+.tank span{position:absolute;inset:0;font-size:13px;font-weight:600;text-align:center;line-height:18px;color:var(--ink);mix-blend-mode:normal;text-shadow:0 0 3px var(--card),0 0 3px var(--card)}
+.rooms{display:flex;gap:6px;margin:10px 0 8px}
+.rooms b{flex:1;text-align:center;border:2px solid var(--line);border-radius:8px;padding:2px 0;font-size:14px;font-weight:600;color:var(--muted)}
+.rooms b.done{background:var(--good);border-color:var(--good);color:var(--card)}
+.rooms b.now{background:var(--accent);border-color:var(--accent);color:var(--aink)}
+.slots{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.slot{width:38px;height:44px;border:2px dashed var(--line);border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:22px}
+.slot.on{border:2px solid var(--accent);background:var(--accent);color:var(--aink)}
+.card{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:18px}
+.story{color:var(--muted);font-size:16px;margin-bottom:12px}
+.q{font-size:20px;font-weight:600;margin:10px 0 14px}
+.opts{display:grid;gap:10px}
+button{font:inherit;cursor:pointer}
+.opt{text-align:left;background:transparent;color:var(--ink);border:2px solid var(--line);border-radius:10px;padding:12px 14px}
+.opt:hover:not(:disabled){border-color:var(--water);background:var(--bg)}
+.opt:disabled{cursor:default}
+.opt.ok{background:var(--gbg);border-color:var(--good)}
+.opt.no{background:var(--bbg);border-color:var(--bad)}
+.go{background:var(--accent);color:var(--aink);border:0;border-radius:10px;padding:12px 20px;font-weight:600;margin-top:12px}
+.fb{margin-top:14px;padding:12px 14px;border-radius:10px;border-left:6px solid}
+.fb.ok{background:var(--gbg);border-color:var(--good)}
+.fb.no{background:var(--bbg);border-color:var(--bad)}
+input{font:inherit;font-size:22px;letter-spacing:4px;text-transform:uppercase;padding:10px 12px;border:2px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);width:100%;max-width:260px}
+:focus-visible{outline:3px solid var(--water);outline-offset:2px}
+ul{padding-left:20px}details{margin:10px 0}summary{cursor:pointer;font-weight:600}
+@media (prefers-reduced-motion:reduce){.tank i{transition:none}}
+</style></head><body><main>
+<h1>Flooded Lab</h1>
+<div id="app"></div>
+</main>
+<script>
+// [question, correct, wrong1, wrong2, wrong3, explanation]
+const N=3; // correct answers needed per room
+const R=[
+{n:"Intake Pipe Room",rev:["A <b>solvent</b> is the substance that does the dissolving. A <b>solute</b> is the substance that gets dissolved. Together they make a <b>solution</b>.", "Water is called the <b>universal solvent</b> because it dissolves more substances than almost any other liquid, such as salt, sugar, minerals, and gases. It cannot dissolve everything. Oil does not dissolve in water.", "Dissolving matters for life. Plants take in dissolved nutrients, blood carries dissolved nutrients and wastes, and dissolved pollutants can spread through lakes and rivers."],s:"6.6a",L:"V",story:"Water is rushing through the intake room. Open all 3 locks to unlock the first door.",qs:[
+["Which statement best explains why water is called the \"universal solvent\"?","It dissolves a wider range of substances than most other liquids","It dissolves every substance without exception","It is the only liquid found on Earth","It never changes phase","Water dissolves many substances, including salts, sugars, minerals, and gases, but not everything. Oil is one example that does not dissolve."],
+["In a saltwater solution, which substance is the solvent?","Water","Salt","Air","Thermal energy","The solvent is the substance that does the dissolving (water). The solute (salt) is what gets dissolved."],
+["Which of these is a solution, meaning a substance dissolved evenly throughout a liquid?","Sugar stirred into water until the liquid is clear","Sand shaken in water","Oil poured onto water","Pebbles dropped in water","In a solution, the particles are dissolved and evenly spread. Sand, oil, and pebbles do not dissolve."],
+["How does water's ability to dissolve substances help a plant?","Roots absorb dissolved minerals and nutrients from soil water","Water turns minerals into sunlight","Water keeps minerals out of the plant","Water makes soil heavier so roots grow","Nutrients dissolved in soil water move into roots and travel through the plant."],
+["Why can pollutants spread easily through lakes and rivers?","Many pollutants dissolve in water and travel with it","Water destroys all pollutants","Pollutants cannot mix with water","Pollutants freeze the water instantly","Because water dissolves many substances, dissolved pollutants can be carried long distances."]]},
+{n:"Lab Bench Room",rev:["At sea level, pure water freezes at <b>0 °C</b> and boils at <b>100 °C</b>. As a liquid, its density is about <b>1 g/mL</b>.", "<b>Cohesion</b> is water molecules sticking to each other. It forms round drops and <b>surface tension</b>. <b>Adhesion</b> is water sticking to other materials, like paper fibers.", "Water expands as it freezes, so ice is <b>less dense</b> than liquid water and floats. Any object less dense than water will float in it."],s:"6.6b",L:"S",story:"Test tubes float past you. Prove you understand water's properties to open all 3 locks.",qs:[
+["Which pair shows the freezing and boiling points of pure water at sea level?","0 °C and 100 °C","0 °C and 212 °C","32 °C and 100 °C","100 °C and 0 °C","On the Celsius scale, pure water freezes at 0 °C and boils at 100 °C. 32 °F and 212 °F are the Fahrenheit values."],
+["Why does ice float on liquid water?","As water freezes, its molecules spread into a pattern that makes ice less dense","Ice has no mass","Ice is denser than liquid water","Ice contains only air","Water expands when it freezes, so ice takes up more space for the same mass. Lower density means it floats."],
+["A paper clip rests on the surface of water without sinking. Which property best explains this?","Surface tension, caused by cohesion","Evaporation","Erosion","Condensation","Cohesion pulls surface molecules together, forming a stretchy \"skin\" called surface tension."],
+["A paper towel touches water and the water climbs upward into it. This is mostly due to...","Adhesion, the attraction between water and other materials","Evaporation","Freezing","Weathering","Adhesion means water molecules are attracted to other substances, such as paper fibers."],
+["The density of liquid water is about 1 g/mL. What will an object with a density of 0.9 g/mL do in pure water?","Float","Sink","Dissolve","Boil","An object that is less dense than the liquid it is placed in will float."]]},
+{n:"Boiler Room",rev:["<b>Thermal energy</b> is the energy of moving particles. Adding it speeds particles up. Removing it slows them down.", "Phase changes that <b>absorb</b> energy: melting (solid to liquid), evaporation and boiling (liquid to gas). Phase changes that <b>release</b> energy: freezing (liquid to solid) and condensation (gas to liquid).", "<b>Evaporation</b> happens at the surface at temperatures below the boiling point. <b>Boiling</b> happens throughout the liquid at the boiling point."],s:"6.6c",L:"R",story:"Steam fills the boiler room. Show how thermal energy drives phase changes to open all 3 locks.",qs:[
+["Thermal energy is added to ice at 0 °C. What phase change occurs?","Melting, from solid to liquid","Condensation, from gas to liquid","Freezing, from liquid to solid","Deposition, from liquid to gas","Adding thermal energy lets the molecules in ice move more freely, so the ice melts."],
+["Water vapor becomes droplets on a cold window. What happens to the vapor's thermal energy?","It decreases as energy transfers to the cold glass","It increases","It stays exactly the same","It turns into mass","Condensation happens when a gas loses thermal energy and becomes a liquid."],
+["How do the molecules in liquid water compare with the molecules in ice?","They move more freely","They do not move at all","They are locked in fixed positions","They are always the same speed","Ice molecules vibrate in fixed positions. Liquid molecules have more thermal energy and slide past each other."],
+["What is the main difference between evaporation and boiling?","Evaporation happens at the surface below the boiling point, but boiling happens throughout the liquid","They are exactly the same process","Evaporation only happens in freezers","Boiling removes thermal energy from water","Boiling happens at the boiling point with bubbles forming throughout. Evaporation happens at the surface at lower temperatures."],
+["Which phase change releases thermal energy?","Freezing","Melting","Evaporation","Boiling","Freezing and condensation release thermal energy. Melting, evaporation, and boiling absorb it."]]},
+{n:"Canyon Cave Room",rev:["<b>Weathering</b> breaks rock into smaller pieces. <b>Erosion</b> moves those pieces to a new place.", "<b>Physical weathering</b> changes the size or shape of rock. Examples: water freezes in a crack and expands (frost wedging), and moving water with sand wears rock away (abrasion).", "<b>Chemical weathering</b> changes the minerals in rock. Example: slightly acidic rain dissolves limestone. Over millions of years, water can carve canyons and round off stream rocks."],s:"6.6d",L:"E",story:"Water has carved a cave into the wall. Explain how water weathers rock to open all 3 locks.",qs:[
+["Water seeps into a crack in a rock, freezes, and widens the crack. Which process is this?","Physical weathering (frost wedging)","Condensation","Chemical dissolving of salt","Deposition","Water expands when it freezes. The ice pushes on the rock and breaks it apart without changing its minerals."],
+["What is the difference between weathering and erosion?","Weathering breaks rock down, and erosion moves the pieces away","Weathering moves rock, and erosion breaks it down","They are exactly the same","Weathering builds mountains, and erosion makes oceans","Weathering breaks down rock where it is. Erosion carries sediment away by water, wind, or ice."],
+["Slightly acidic rainwater slowly wears away a limestone statue. This is an example of...","Chemical weathering","Physical weathering only","Condensation","Evaporation","Chemical weathering changes or dissolves the minerals in a rock."],
+["Which situation would cause the fastest physical weathering of a riverbed?","Fast-moving water carrying sand and gravel","A still, calm pond","Dry sand on a beach","Frozen soil in a dry desert","Moving water full of sediment scrapes and wears rock away through abrasion."],
+["A canyon is carved by a river over millions of years. Which processes did most of the work?","Weathering and erosion by moving water","A single volcanic eruption","Condensation of clouds","Evaporation of the ocean","Rivers gradually break down rock and carry it away, carving deep valleys."]]},
+{n:"Harbor Room",rev:["Water needs a lot of thermal energy to heat up and releases it slowly, so it <b>heats and cools more slowly</b> than land.", "Large bodies of water <b>moderate</b> climate. Nearby summers are cooler, winters are warmer, and temperature swings are smaller. Land far from water changes temperature faster.", "Ocean currents, like the Gulf Stream, carry warm water and can warm the land they flow near."],s:"6.6e",L:"I",story:"Waves slosh against the harbor wall. Explain how large bodies of water affect climate to open all 3 locks.",qs:[
+["Why do coastal regions usually have milder temperatures than inland regions?","Large bodies of water absorb and release thermal energy slowly","Oceans are always warmer than land","Coastal areas get no sunlight","Inland areas always get more rain","Water changes temperature slowly, so it cools summer air and warms winter air near the coast."],
+["On a summer afternoon, beach sand is much hotter than the ocean. Why?","Water must absorb much more thermal energy to increase its temperature","The sun only shines on sand","Water reflects all sunlight","Sand is wetter than water","Water heats up slowly, so the same sunlight raises the temperature of sand much more."],
+["What does it mean to say a large lake moderates the climate?","It reduces extreme hot and cold temperatures nearby","It makes the area permanently hot","It prevents all precipitation","It makes days longer","To moderate means to make less extreme. Lakes keep temperature swings smaller."],
+["A town far from any large body of water often has big temperature swings. Why?","Land heats up and cools down quickly without water to moderate it","The sun is stronger there","Air cannot hold thermal energy","It is closer to the ocean floor","Land has no large water body to store and release thermal energy slowly."],
+["The Gulf Stream carries warm ocean water northward. How does this affect western Europe?","It makes winters milder than expected","It makes winters colder","It stops all rainfall","It freezes the coast","Ocean currents move thermal energy around Earth, warming the land they flow near."]]},
+{n:"Control Room",rev:["<b>Agriculture:</b> crops and livestock need water, and <b>irrigation</b> brings water to fields.", "<b>Power generation:</b> hydroelectric dams use falling water to spin turbines. Many power plants heat water into steam that spins turbines.", "<b>Public health:</b> water treatment removes germs from drinking water, and clean water for washing and sanitation helps stop the spread of disease."],s:"6.6f",L:"R",story:"One door remains. Show how people depend on water to open all 3 locks and drain the lab.",qs:[
+["Why is water essential for agriculture?","Crops and livestock need it, and irrigation brings it to fields","It turns soil into metal","It makes the sun shine on crops","It is only used to wash tractors","Plants and animals need water to live and grow. Irrigation supplies fields during dry weather."],
+["How does a hydroelectric dam generate electricity?","Falling water spins turbines connected to generators","Water burns as fuel","Water melts the dam's wires","Fish push the generators","The kinetic energy of moving water is transformed into electrical energy."],
+["How does treating drinking water protect public health?","It removes or kills germs that cause waterborne diseases","It adds more minerals to make water heavier","It makes water freeze at a higher temperature","It stops water from dissolving things","Purification and disinfection prevent illnesses such as cholera and other waterborne diseases."],
+["Why does washing hands with clean water and soap improve public health?","It removes germs and helps stop diseases from spreading","It gives people vitamins","It makes germs multiply","It makes skin waterproof","Clean water for hygiene reduces the spread of disease."],
+["Many power plants heat water into steam. What does the steam do?","Spins turbines that run generators","Becomes the fuel that burns","Cools the plant by freezing","Creates new water","The force of expanding steam turns turbine blades, producing electricity."]]}
+];
+const CODE="RIVERS";
+const $=s=>document.querySelector(s),app=$("#app");
+let st;
+const esc=t=>String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+function hud(){
+ const lvl=100*(1-(st.done*N+(st.got||0))/(6*N));
+ return `<div class="hud"><div class="tank" role="img" aria-label="Water level ${Math.round(lvl)} percent"><i style="width:${lvl}%"></i><span>Water level</span></div>
+ <div class="rooms">${R.map((r,i)=>`<b class="${i<st.done?"done":i===st.done&&st.mode!=="final"&&st.mode!=="win"?"now":""}">${i+1}</b>`).join("")}</div>
+ <div class="slots" aria-label="Collected letters">${R.map((r,i)=>`<div class="slot ${i<st.done?"on":""}">${i<st.done?r.L:"?"}</div>`).join("")}<span class="muted">&nbsp;Letters you have found</span></div></div>`}
+function pick(){const r=R[st.done],s=st.seen[st.done],all=r.qs.map((_,i)=>i);
+ let un=all.filter(i=>!s.includes(i));
+ if(!un.length){const last=s[s.length-1];s.length=0;un=all.filter(i=>i!==last)}
+ const i=un[Math.random()*un.length|0];s.push(i);return r.qs[i]}
+function start(){st={done:0,got:0,seen:R.map(()=>[]),mode:"review"};draw()}
+function ask(){st.mode="q";st.q=pick();st.o=shuf([0,1,2,3].map(k=>({t:st.q[1+k],ok:k===0})));draw()}
+function draw(){
+ if(st.mode==="review"){const r=R[st.done];app.innerHTML=hud()+`<div class="card"><h2>Room ${st.done+1}: ${r.n}</h2><div class="story">Standard ${r.s}. Quick review before you enter.</div><ul>${r.rev.map(x=>`<li>${x}</li>`).join("")}</ul><button class="go" id="b">Enter the room</button></div>`;$("#b").onclick=()=>{ask();window.scrollTo(0,0)};$("#b").focus();return}
+ if(st.mode==="intro"){app.innerHTML=`<div class="card"><h2>The lab is flooding!</h2><p>You are a student scientist trapped in a flooded research lab. There are 6 locked rooms. Before each room, you get a quick science review. Each door has 3 locks. Answer 3 water science questions correctly to open all the locks and get that room's letter.</p><p>After the last room, unscramble the 6 letters to open the exit.</p><p class="muted"><b>Rules:</b> You can try as many times as you need. If you miss a question, you will get a different question to try. Read the hint and learn from it!</p><button class="go" id="b">Start escape</button></div>`;$("#b").onclick=start;return}
+ if(st.mode==="win"){app.innerHTML=hud()+`<div class="card"><h2>You escaped! The lab is drained.</h2><p>The code word was <b>${CODE}</b>. You used what you know about water:</p><ul><li>Water dissolves many substances (the universal solvent).</li><li>Water has special properties: freezing and boiling points, cohesion, and ice that floats.</li><li>Thermal energy causes phase changes.</li><li>Water breaks down rock (weathering).</li><li>Large bodies of water moderate climate.</li><li>People need water for farms, power, and health.</li></ul><button class="go" id="b">Play again</button></div>`;$("#b").onclick=start;return}
+ if(st.mode==="final"){app.innerHTML=hud()+`<div class="card"><h2>The exit door</h2><p class="story">Unscramble all 6 letters to make a word for flowing bodies of water (more than one). Type it in.</p><input id="i" maxlength="12" autocomplete="off" aria-label="Code word"><br><button class="go" id="b">Open the door</button><div id="f" aria-live="polite"></div></div>`;
+  const go=()=>{if($("#i").value.trim().toUpperCase()===CODE){st.mode="win";draw()}else $("#f").innerHTML=`<div class="fb no"><b>The door stays locked.</b> Hint: look at your letters ${R.map(r=>r.L).join(", ")}. Try other orders. You can try again as many times as you like.</div>`};
+  $("#b").onclick=go;$("#i").onkeydown=e=>{if(e.key==="Enter")go()};$("#i").focus();return}
+ const r=R[st.done];
+ app.innerHTML=hud()+`<div class="card"><h2>Room ${st.done+1}: ${r.n}</h2><div class="story">Standard ${r.s}. ${r.story}</div><div class="muted" aria-live="polite">Locks opened: ${"●".repeat(st.got)}${"○".repeat(N-st.got)} (${st.got} of ${N})</div><details><summary>Review notes</summary><ul>${r.rev.map(x=>`<li>${x}</li>`).join("")}</ul></details><div class="q" id="q" tabindex="-1">${esc(st.q[0])}</div>
+ <div class="opts">${st.o.map((o,i)=>`<button class="opt" data-i="${i}">${esc(o.t)}</button>`).join("")}</div><div id="f" aria-live="polite"></div></div>`;
+ document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>answer(+b.dataset.i));
+}
+function answer(i){
+ const ok=st.o[i].ok,bs=document.querySelectorAll(".opt");
+ bs.forEach((b,k)=>{b.disabled=true;if(k===i)b.classList.add(ok?"ok":"no")});
+ const f=$("#f"),ex=esc(st.q[5]);
+ if(ok){st.got++;const open=st.got>=N,L=R[st.done].L;f.innerHTML=`<div class="fb ok"><b>${open?"Correct! The last lock clicks and the door opens.":"Correct! A lock clicks open."}</b>${open?` You found the letter <b>${L}</b>.`:` ${st.got} of ${N} locks open.`}<br>${ex}</div><button class="go" id="n">${open?(st.done===5?"Go to the exit":"Next room"):"Next question"}</button>`;
+  $("#n").onclick=()=>{if(open){st.done++;st.got=0}if(st.done===6){st.mode="final";draw()}else if(open){st.mode="review";draw()}else ask();window.scrollTo(0,0)};$("#n").focus()} else{f.innerHTML=`<div class="fb no"><b>Not quite. The door is still locked.</b><br>${ex}</div><button class="go" id="n">Try a new question</button>`;
+  $("#n").onclick=()=>{ask();window.scrollTo(0,0)};$("#n").focus()}
+}
+st={done:0,mode:"intro"};draw();
+</script></body></html>
